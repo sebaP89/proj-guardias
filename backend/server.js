@@ -16,6 +16,9 @@ app.get('/', (req, res) => {
 
 app.post('/api/v1/users', Users.create);
 app.post('/api/v1/users/:id', Users.delete);
+app.post('/api/v1/user/login', Users.login);
+app.get('/api/v1/user/specialities/:id',  Users.getSpecialitiesFromUserId);
+app.get('/api/v1/user/clinics/:id&:specialityId',  Users.getClinicsFromSpecialityId);
 app.post('/api/v1/healthInsurance', HealthInsurance.create);
 app.delete('/api/v1/healthInsurance/:id', HealthInsurance.delete);
 app.get('/api/v1/healthInsurance', HealthInsurance.getAll);

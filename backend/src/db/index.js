@@ -15,6 +15,7 @@ export default {
    * @returns {object} object 
    */
   query(text, params){
+    console.log(params);
     return new Promise((resolve, reject) => {
       pool.query(text, params)
       .then((res) => {

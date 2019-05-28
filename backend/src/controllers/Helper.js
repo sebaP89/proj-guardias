@@ -17,6 +17,7 @@ const Helper = {
    * @returns {Boolean} return True or False
    */
   comparePassword(hashPassword, password) {
+    console.log("DB pass: " + hashPassword + "Login pass: " + password);
     return bcrypt.compareSync(password, hashPassword);
   },
   /**

@@ -1,31 +1,35 @@
-
 import AsyncStorage from '@react-native-community/async-storage';
+import {
+    GET_TOKEN,
+    SAVE_TOKEN,
+    REMOVE_TOKEN,
+    LOADING,
+    ERROR
+  } from "../constants/actionsTypes";
 
-export const getToken = (token) => ({
-    type: 'GET_TOKEN',
+const getToken = (token) => ({
+    type: GET_TOKEN,
     token,
 });
 
-export const saveToken = token => ({
-    type: 'SAVE_TOKEN',
+const saveToken = token => ({
+    type: SAVE_TOKEN,
     token
 });
 
-export const removeToken = () => ({
-    type: 'REMOVE_TOKEN',
+const removeToken = () => ({
+    type: REMOVE_TOKEN,
 });
 
-export const loading = bool => ({
-    type: 'LOADING',
+const loading = bool => ({
+    type: LOADING,
     isLoading: bool,
 });
 
-export const error = error => ({
-    type: 'ERROR',
+const error = error => ({
+    type: ERROR,
     error,
 });
-
-
 
 export const getUserToken = () => dispatch => 
     AsyncStorage.getItem('@userToken')
@@ -37,8 +41,6 @@ export const getUserToken = () => dispatch =>
             dispatch(loading(false));
             dispatch(error(err.message || 'ERROR'));
         })
-
-
 
 export const saveUserToken = (data) => dispatch =>
     AsyncStorage.setItem('@userToken', 'abc')

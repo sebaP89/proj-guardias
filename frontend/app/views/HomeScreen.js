@@ -1,37 +1,79 @@
 import React from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { Button, StyleSheet, View, Text, FlatList } from 'react-native';
+import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { removeUserToken } from '../actions/actions';
+import { logedout, fetchSpecialities } from '../actions/userActions';
 
 class HomeScreen extends React.Component {
-    render() {
+
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {
+        this.props.fetchSpecialities(this.props.idUser);
+    }
+
+    keyExtractor = (item, index) => index.toString()
+
+    renderItem = ({ item }) => (
+    <ListItem
+        containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}
+        title={item.specialityName}
+        containerStyle={{ borderBottomWidth: 0 }}
+        onPress={this._showMoreApp}
+    />
+    )
+
+    renderSeparator = () => {
         return (
-            <View style={styles.container}>
-                <View>
-                    <Button title="Show me more of the app" onPress={this._showMoreApp} />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                    <Button title="Actually, sign me out :)" onPress={this._signOutAsync} />
-                </View>
-            </View>
+          <View
+            style={{
+              height: 1,
+              width: "86%",
+              backgroundColor: "#CED0CE",
+              marginLeft: "14%"
+            }}
+          />
         );
+    };
+
+    render() {
+        console.log(this.props.specialities);
+        return (
+            <View>
+            <FlatList
+              keyExtractor={this.keyExtractor}
+              data={this.props.specialities}
+              renderItem={this.renderItem}
+              containerStyle={{ borderBottomWidth: 0 }}
+              ItemSeparatorComponent={this.renderSeparator}
+            />
+            <Button title="I'm done, sign me out" onPress={this._signOutAsync} />
+            </View>
+          )
     }
 
     _showMoreApp = () => {
-        this.props.navigation.navigate('Other');
+        this.props.navigation.navigate('Other', 
+        {specialityId:'7ab5873c-d4dd-3dd9-9e92-a8a58676b6a6'});
     };
 
     _signOutAsync = () => {
-        this.props.removeUserToken()
-            .then(() => {
-                this.props.navigation.navigate('Auth');
-            })
-            .catch(error => {
-                this.setState({ error })
-            })
-
+        this.props.logout();
+        this.props.navigation.navigate('Auth');
     };
 }
+
+const mapStateToProps = state => ({
+    specialities: state.user.specialities,
+    idUser: state.user.idUser,
+})
+
+const mapDispatchToProps = dispatch => ({
+    logout: () => dispatch(logedout()),
+    fetchSpecialities: userId => dispatch(fetchSpecialities(userId)),
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -40,16 +82,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-});
-
-
-
-const mapStateToProps = state => ({
-    token: state.token,
-});
-
-const mapDispatchToProps = dispatch => ({
-    removeUserToken: () => dispatch(removeUserToken()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
