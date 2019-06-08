@@ -24,7 +24,7 @@ class LoginScreen extends React.Component {
       
       if (userId != '') {
         console.log('user valid');
-        this.props.navigation.navigate('App');
+        this.props.navigation.navigate('Urgencies');
       } else {
         alert('Usuario o contraseña incorrecta!')
       }

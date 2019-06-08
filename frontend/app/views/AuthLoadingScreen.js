@@ -1,7 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StatusBar, StyleSheet, View } from 'react-native';
 import { connect } from 'react-redux';
-import { getUserToken } from '../actions/tokenActions';
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
@@ -18,7 +17,7 @@ class AuthLoadingScreen extends React.Component {
 
     _bootstrapAsync = () => {
         // modify when token logic is implemented
-        this.props.navigation.navigate(this.props.userValid === true ? 'App' : 'Auth');
+        this.props.navigation.navigate(this.props.userValid === true ? 'Urgencies' : 'Auth');
     };
 
     // Render any loading content that you like here

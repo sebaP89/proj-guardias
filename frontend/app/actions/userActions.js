@@ -57,7 +57,7 @@ export const logedout = () => ({
 });
 
 function isUserValid(user) {
-    return fetch('http://10.0.2.2:3000/api/v1/user/login/', {
+    return fetch('http://10.28.120.140:3000/api/v1/user/login/', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -86,7 +86,7 @@ export function validateUser(user) {
 export function fetchSpecialities(userId) {
     return dispatch => {
         dispatch(fetchSpecialitiesPending());
-        fetch(`http://10.0.2.2:3000/api/v1/user/specialities/${userId}`, {
+        fetch(`http://10.28.120.140:3000/api/v1/user/specialities/${userId}`, {
         method: 'GET'})
         .then(response => response.json())
         .then(response => {
@@ -105,7 +105,7 @@ export function fetchSpecialities(userId) {
 export function fetchClinicsForSpeciality(userId, specialityId) {
     return dispatch => {
         dispatch(fetchClinicsForSpecialityPending());
-        fetch(`http://10.0.2.2:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
+        fetch(`http://10.28.120.140:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
         method: 'GET'})
         .then(response => response.json())
         .then(response => {

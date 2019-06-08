@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, StatusBar, StyleSheet, View, FlatList } from 'react-native';
+import { Button, StyleSheet, View, FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { logedout, fetchClinicsForSpeciality } from '../actions/userActions';
 
-class OtherScreen extends React.Component {
+class ClinicsScreen extends React.Component {
     
     constructor(props) {
         super(props);
@@ -22,7 +22,7 @@ class OtherScreen extends React.Component {
         containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}
         title={item.clinicName}
         containerStyle={{ borderBottomWidth: 0 }}
-        onPress={this._showMoreApp}
+        onPress={this._moveToBooking(item.clinicId, item.clinicName, item.clinicCoords)}
     />
     )
 
@@ -55,6 +55,15 @@ class OtherScreen extends React.Component {
           )
     }
 
+    _moveToBooking = (id, name, coords) => {
+        console.log(`coordinates: ${coords}`)
+        this.props.navigation.navigate('Booking', 
+            {clinicId: id, 
+             clinicName: name,
+             clinicCoords: coords,
+             specialityId: this.props.navigation.getParam('specialityId')});
+    }
+
     _signOutAsync = () => {
         this.props.logout();
         this.props.navigation.navigate('Auth');
@@ -80,4 +89,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(OtherScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(ClinicsScreen);

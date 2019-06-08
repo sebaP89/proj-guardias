@@ -4,8 +4,8 @@ import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { logedout, fetchSpecialities } from '../actions/userActions';
 
-class HomeScreen extends React.Component {
-
+class SpecialitiesScreen extends React.Component {
+  
     constructor(props) {
         super(props);
     }
@@ -55,7 +55,7 @@ class HomeScreen extends React.Component {
     }
 
     _showMoreApp = () => {
-        this.props.navigation.navigate('Other', 
+        this.props.navigation.navigate('Clinics', 
         {specialityId:'7ab5873c-d4dd-3dd9-9e92-a8a58676b6a6'});
     };
 
@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SpecialitiesScreen);
