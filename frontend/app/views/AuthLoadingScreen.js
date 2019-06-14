@@ -17,7 +17,7 @@ class AuthLoadingScreen extends React.Component {
 
     _bootstrapAsync = () => {
         // modify when token logic is implemented
-        this.props.navigation.navigate(this.props.userValid === true ? 'Urgencies' : 'Auth');
+        this.props.navigation.navigate(this.props.userValid === true ? 'Main' : 'Auth');
     };
 
     // Render any loading content that you like here

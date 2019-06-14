@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, StyleSheet, View, FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { logedout, fetchClinicsForSpeciality } from '../actions/userActions';
+import { fetchClinicsForSpeciality } from '../actions/userActions';
 
 class ClinicsScreen extends React.Component {
     
@@ -43,14 +43,13 @@ class ClinicsScreen extends React.Component {
         console.log(this.props.clinicsForSpeciality);
         return (
             <View>
-            <FlatList
-              keyExtractor={this.keyExtractor}
-              data={this.props.clinicsForSpeciality}
-              renderItem={this.renderItem}
-              containerStyle={{ borderBottomWidth: 0 }}
-              ItemSeparatorComponent={this.renderSeparator}
-            />
-            <Button title="I'm done, sign me out" onPress={this._signOutAsync} />
+                <FlatList
+                keyExtractor={this.keyExtractor}
+                data={this.props.clinicsForSpeciality}
+                renderItem={this.renderItem}
+                containerStyle={{ borderBottomWidth: 0 }}
+                ItemSeparatorComponent={this.renderSeparator}
+                />
             </View>
           )
     }
@@ -63,11 +62,6 @@ class ClinicsScreen extends React.Component {
              clinicCoords: coords,
              specialityId: this.props.navigation.getParam('specialityId')});
     }
-
-    _signOutAsync = () => {
-        this.props.logout();
-        this.props.navigation.navigate('Auth');
-    };
 }
 
 const mapStateToProps = state => ({
@@ -76,7 +70,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    logout: () => dispatch(logedout()),
     fetchClinicsForSpeciality: (userId, specialityId) => dispatch(fetchClinicsForSpeciality(userId, specialityId)),
 });
 

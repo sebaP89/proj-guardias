@@ -24,8 +24,6 @@ class BookingScreen extends React.Component {
                 >
                     <Text style={styles.btnText}>GENERAR ORDEN</Text>
                 </TouchableOpacity>
-
-                <Button title="I'm done, sign me out" onPress={this._signOutAsync} />
             </View>
         );
     }
@@ -37,11 +35,6 @@ class BookingScreen extends React.Component {
         //const specialityId = this.props.navigation.getParam('specialityId', '-1');
         //this.props.book(clinicId, specialityId);
     };
-
-    _signOutAsync = () => {
-        this.props.logout();
-        this.props.navigation.navigate('Auth');
-    };
 }
 
 const mapStateToProps = state => ({
@@ -50,7 +43,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    logout: () => dispatch(logedout()),
     //book: (clinicId, specialityId) => dispatch(book(clinicId, specialityId))
 });
 
