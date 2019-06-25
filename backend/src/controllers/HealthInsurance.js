@@ -55,10 +55,10 @@ const HealthInsurance = {
    * @returns {object} HealthInsurance array
    */
   async getAll(req, res) {
-    const findAllQuery = 'SELECT * FROM public."healthInsurance"';
+    const findAllQuery = 'SELECT "hi"."id" as "idClinic", "hi"."name" as "clinicName" FROM public."healthInsurance" as hi';
     try {
-      const { rows, rowCount } = await db.query(findAllQuery);
-      return res.status(200).send({ rows, rowCount });
+      const { rows } = await db.query(findAllQuery);
+      return res.status(200).send({ clinics: rows });
     } catch(error) {
       return res.status(400).send(error);
     }

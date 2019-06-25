@@ -8,11 +8,14 @@ export default class MainScreen extends React.Component {
     }
 
     static navigationOptions = ({ navigation }) => ({
+      headerTitle: "Planificar Salud",
       headerTransparent: true,
+      headerTitleStyle: { color: '#FFFFFF' },
       headerLeft: (
           <Icon
             name="md-menu"
             type="ionicon"
+            color='#FFFFFF'
             containerStyle={styles.icon}
             onPress={() => navigation.toggleDrawer()}
           />
@@ -21,13 +24,13 @@ export default class MainScreen extends React.Component {
 
     render() {
       return (
-        <ImageBackground source={require('../image/river.png')} style={{width: '100%', height: '100%'}}/>
+        <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%'}}/>
       );
     }
 }
 
 const styles = StyleSheet.create({
   icon: {
-      paddingLeft: 10
+      paddingLeft: 10,
   }
 });

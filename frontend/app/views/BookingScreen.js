@@ -1,8 +1,25 @@
 import React from 'react';
-import { StyleSheet, Text, Button, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, ImageBackground, TouchableOpacity, View } from 'react-native';
+import { ListItem, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 
 class BookingScreen extends React.Component {
+
+    static navigationOptions = ({ navigation }) => ({
+        headerTitle: "Turno",
+        headerTransparent: true,
+        headerTitleStyle: { color: '#FFFFFF' },
+        headerLeft: (
+            <Icon
+              name="md-menu"
+              type="ionicon"
+              color='#FFFFFF'
+              containerStyle={styles.icon}
+              onPress={() => navigation.toggleDrawer()}
+            />
+          )
+    });
+
     render() {
         const clinicId = this.props.navigation.getParam('clinicId', '-1');
         const clinicName = this.props.navigation.getParam('clinicName', 'No Name');
@@ -14,17 +31,18 @@ class BookingScreen extends React.Component {
         console.log(`longitude: ${arr[1]}`);
 
         return (
-            <View style={styles.container}>
-                <Text style={styles.welcome}>Reserva!</Text>
-                <Text style={styles.welcome}>{clinicId}</Text>
-                <Text style={styles.welcome}>{clinicName}</Text>
-                <TouchableOpacity
-                    style={styles.btn}
-                    onPress={this._signInAsync}
-                >
-                    <Text style={styles.btnText}>GENERAR ORDEN</Text>
-                </TouchableOpacity>
-            </View>
+            <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%'}}>
+                <View style={styles.container}>
+                    <Text style={styles.welcome}>Reserva!</Text>
+                    <Text style={styles.welcome}>{clinicName}</Text>
+                    <TouchableOpacity
+                        style={styles.btn}
+                        onPress={this._signInAsync}
+                    >
+                        <Text style={styles.btnText}>GENERAR ORDEN</Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
         );
     }
 
@@ -49,13 +67,13 @@ const mapDispatchToProps = dispatch => ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#F5FCFF'
+        justifyContent: 'center'
     },
     welcome: {
         fontSize: 20,
         textAlign: 'center',
         margin: 10,
+        color: '#FFFFFF'
     },
     input: {
         borderBottomWidth: 1,

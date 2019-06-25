@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
-import { validateUser } from '../actions/userActions';
+import { validateUser, logedout } from '../actions/userActions';
 
 class LoginScreen extends React.Component {
   constructor(props) {
@@ -27,22 +27,25 @@ class LoginScreen extends React.Component {
         this.props.navigation.navigate('Main');
       } else {
         alert('Usuario o contraseña incorrecta!')
+        this.props.logout();
       }
     }
 
     return (
-
+    <ImageBackground source={require('../image/planificarBlur.png')} style={{width: '100%', height: '100%'}}>
       <View style={styles.container}>
-        <Text style={styles.welcome}>Login</Text>
+
         <TextInput
           style={styles.input}
-          placeholder="Usuario"
+          placeholder="Email"
+          placeholderTextColor = "#FFFFFF"
           onChangeText={(text) => this.setState({ username: text })}
           value={this.state.username}
         />
         <TextInput
           style={styles.input}
           placeholder="Contraseña"
+          placeholderTextColor = "#FFFFFF"
           onChangeText={(text) => this.setState({ password: text })}
           value={this.state.password}
           secureTextEntry={true}
@@ -50,7 +53,7 @@ class LoginScreen extends React.Component {
         <TouchableOpacity
           style={styles.btn}
           onPress={this._signInAsync}
-        >
+          >
           <Text style={styles.btnText}>INGRESAR</Text>
         </TouchableOpacity>
 
@@ -62,14 +65,22 @@ class LoginScreen extends React.Component {
         </TouchableOpacity>
 
       </View>
+    </ImageBackground>
     );
   }
 
   _signInAsync = async => {
-    let potentialUser = { username: this.state.username, password: this.state.password };
-    console.log('username: ' + potentialUser.username + ' password: ' + potentialUser.password);
 
-    this.props.validateUser(potentialUser);
+    if (this.state.username != "" &&
+        this.state.password != "")
+    {
+      let potentialUser = { username: this.state.username, password: this.state.password };
+      this.props.validateUser(potentialUser);
+    }
+    else
+    {
+      alert('Por favor, ingrese usuario y contraseña');
+    }
   };
 }
 
@@ -81,14 +92,14 @@ const mapStateToProps = state => ({
 
 
 const mapDispatchToProps = dispatch => ({
-  validateUser: (user) => dispatch(validateUser(user))
+  validateUser: (user) => dispatch(validateUser(user)),
+  logout: () => dispatch(logedout()),
 });
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#F5FCFF'
+    justifyContent: 'center'
   },
   welcome: {
     fontSize: 20,
@@ -100,13 +111,16 @@ const styles = StyleSheet.create({
     margin: 15,
     height: 40,
     padding: 5,
-    fontSize: 16,
-    borderBottomColor: '#42BAF8'
+    fontSize: 18,
+    borderBottomColor: '#42BAF8',
+    color: '#FFFFFF'
   },
   btn: {
     justifyContent: 'space-between',
     flexDirection: 'column',
-    backgroundColor: '#42BAF8',
+    borderWidth: 1,
+    borderRadius:10,
+    borderColor: '#FFFFFF',
     alignItems: 'center',
     marginLeft: 15,
     marginRight: 15,
@@ -114,8 +128,8 @@ const styles = StyleSheet.create({
     padding: 10
   },
   btnText: {
-    color: '#ffffff',
-    fontWeight: '700'
+    color: '#FFFFFF',
+    fontWeight: '700',
   }
 });
 

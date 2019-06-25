@@ -12,7 +12,7 @@ class BurgerMenu extends PureComponent {
         <ScrollView style={styles.container}>
           <DrawerItems {...this.props} />
         </ScrollView>
-        <Button icon={{ name: "md-log-out", type: "ionicon" }} title="Log Out" onPress={this._signOutAsync} />
+        <Button style={{backgroundColor: "#39B1F7"}} icon={{ name: "md-log-out", type: "ionicon" }} title="Log Out" onPress={this._signOutAsync} />
       </SafeAreaView>
     );
   }

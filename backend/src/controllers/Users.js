@@ -13,7 +13,9 @@ const Users = {
   async create(req, res) {
     if (!req.body.email ||
       !req.body.firstname ||
-      !req.body.lastname) {
+      !req.body.lastname ||
+      !req.body.password ||
+      !req.body.idClinic) {
       return res.status(400).send({ 'message': 'Some values are missing' });
     }
     if (!Helper.isValidEmail(req.body.email)) {
@@ -23,21 +25,25 @@ const Users = {
     const hashPassword = Helper.hashPassword(req.body.password);
 
     const createQuery = `INSERT INTO
-      public."user"(id, email, firstname, lastname, password)
-      VALUES($1, $2, $3, $4, $5)
+      public."user"(id, email, firstname, lastname, password, "idHealthInsurance")
+      VALUES($1, $2, $3, $4, $5, $6)
       returning *`;
     const values = [
       uuidv4(),
       req.body.email,
       req.body.firstname,
       req.body.lastname,
-      hashPassword
+      hashPassword,
+      req.body.idClinic
     ];
 
     try {
       const { rows } = await db.query(createQuery, values);
+      const token = Helper.generateToken(rows[0].id);
+      console.log(token);
       return res.status(201).send({ 'message': 'created' });
     } catch (error) {
+      console.log(error);
       if (error.routine === '_bt_check_unique') {
         return res.status(400).send({ 'message': 'User with that EMAIL already exist' })
       }

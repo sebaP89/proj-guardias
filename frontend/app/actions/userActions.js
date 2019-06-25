@@ -3,12 +3,17 @@ import {
     INVALID_USER,
     VALIDATE_USER_BEGIN,
     LOGED_OUT,
+    USER_CREATED,
+    ERROR_CREATING_USER,
     FETCH_SPECIALITIES_PENDING,
     FETCH_SPECIALITIES_ERROR,
     FETCH_SPECIALITIES_SUCCESS,
     FETCH_CLINICS_ERROR,
     FETCH_CLINICS_PENDING,
     FETCH_CLINICS_SUCCESS,
+    FETCH_CLINICS_FOR_SPECIALITY_PENDING,
+    FETCH_CLINICS_FOR_SPECIALITY_SUCCESS,
+    FETCH_CLINICS_FOR_SPECIALITY_ERROR,
 } from "../constants/actionsTypes";
 
 const userValid = (idUser) => ({
@@ -24,7 +29,16 @@ const validatingUser = () => ({
     type: VALIDATE_USER_BEGIN
 });
 
-export const fetchSpecialitiesPending = () => ({
+const userCreated = () => ({
+    type: USER_CREATED
+});
+
+const errorCreatingUser = (error) => ({
+    type: ERROR_CREATING_USER,
+    error: error
+});
+
+const fetchSpecialitiesPending = () => ({
     type: FETCH_SPECIALITIES_PENDING
 });
 
@@ -38,17 +52,31 @@ const fetchSpecialitiesError = (error) => ({
     error: error
 });
 
-export const fetchClinicsForSpecialityPending = () => ({
+const fetchClinicsPending = () => ({
     type: FETCH_CLINICS_PENDING
 });
 
-const fetchClinicsForSpecialitySuccess = (clinicsForSpeciality) => ({
+const fetchClinicsSuccess = (clinics) => ({
     type: FETCH_CLINICS_SUCCESS,
+    clinics: clinics
+});
+
+const fetchClinicsError = (error) => ({
+    type: FETCH_CLINICS_ERROR,
+    error: error
+});
+
+export const fetchClinicsForSpecialityPending = () => ({
+    type: FETCH_CLINICS_FOR_SPECIALITY_PENDING
+});
+
+const fetchClinicsForSpecialitySuccess = (clinicsForSpeciality) => ({
+    type: FETCH_CLINICS_FOR_SPECIALITY_SUCCESS,
     clinicsForSpeciality: clinicsForSpeciality
 });
 
 const fetchClinicsForSpecialityError = (error) => ({
-    type: FETCH_CLINICS_ERROR,
+    type: FETCH_CLINICS_FOR_SPECIALITY_ERROR,
     error: error
 });
 
@@ -57,7 +85,8 @@ export const logedout = () => ({
 });
 
 function isUserValid(user) {
-    return fetch('http://10.0.2.2:3000/api/v1/user/login/', {
+    //return fetch('http://10.0.2.2:3000/api/v1/user/login/', {
+    return fetch('http://192.168.1.19:3000/api/v1/user/login/', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -83,10 +112,63 @@ export function validateUser(user) {
     }
 };
 
+export function fetchClinics() {
+    return dispatch => {
+        dispatch(fetchClinicsPending());
+        //fetch('http://10.0.2.2:3000/api/v1/healthInsurance', {
+        fetch('http://192.168.1.19:3000/api/v1/healthInsurance', {
+        method: 'GET'})
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(fetchClinicsSuccess(response.clinics));
+            return response.clinics;
+        })
+        .catch(error => {
+            dispatch(fetchClinicsError(error));
+        })
+    }
+};
+
+export function createUser(user, idClinic) {
+    return dispatch => {
+        //fetch('http://10.0.2.2:3000/api/v1/users', {
+        fetch('http://192.168.1.19:3000/api/v1/users', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                password: user.password,
+                idClinic: idClinic
+            })
+        })
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(userCreated());
+            return response.message;
+        })
+        .catch(error => {
+            dispatch(errorCreatingUser(error));
+        })
+    }
+};
+
 export function fetchSpecialities(userId) {
     return dispatch => {
         dispatch(fetchSpecialitiesPending());
-        fetch(`http://10.0.2.2:3000/api/v1/user/specialities/${userId}`, {
+        //fetch(`http://10.0.2.2:3000/api/v1/user/specialities/${userId}`, {
+        fetch(`http://192.168.1.19:3000/api/v1/user/specialities/${userId}`, {
+            
         method: 'GET'})
         .then(response => response.json())
         .then(response => {
@@ -105,7 +187,8 @@ export function fetchSpecialities(userId) {
 export function fetchClinicsForSpeciality(userId, specialityId) {
     return dispatch => {
         dispatch(fetchClinicsForSpecialityPending());
-        fetch(`http://10.0.2.2:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
+        //fetch(`http://10.0.2.2:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
+        fetch(`http://192.168.1.19:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
         method: 'GET'})
         .then(response => response.json())
         .then(response => {

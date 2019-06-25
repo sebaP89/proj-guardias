@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, StyleSheet, View, FlatList } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ImageBackground, StyleSheet, View, FlatList } from 'react-native';
+import { ListItem, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchClinicsForSpeciality } from '../actions/userActions';
 
@@ -9,6 +9,21 @@ class ClinicsScreen extends React.Component {
     constructor(props) {
         super(props);
     }
+
+    static navigationOptions = ({ navigation }) => ({
+        headerTitle: "Clinicas",
+        headerTransparent: true,
+        headerTitleStyle: { color: '#FFFFFF' },
+        headerLeft: (
+            <Icon
+              name="md-menu"
+              type="ionicon"
+              color='#FFFFFF'
+              containerStyle={styles.icon}
+              onPress={() => navigation.toggleDrawer()}
+            />
+          )
+    });
 
     componentDidMount() {
         const { navigation } = this.props;
@@ -19,10 +34,10 @@ class ClinicsScreen extends React.Component {
 
     renderItem = ({ item }) => (
     <ListItem
-        containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}
+        containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0, backgroundColor: 'transparent' }}
+        titleStyle={{ color: '#FFFFFF'}}
         title={item.clinicName}
-        containerStyle={{ borderBottomWidth: 0 }}
-        onPress={this._moveToBooking(item.clinicId, item.clinicName, item.clinicCoords)}
+        onPress={() => this._moveToBooking(item.clinicId, item.clinicName, item.clinicCoords)}
     />
     )
 
@@ -42,15 +57,17 @@ class ClinicsScreen extends React.Component {
     render() {
         console.log(this.props.clinicsForSpeciality);
         return (
-            <View>
-                <FlatList
-                keyExtractor={this.keyExtractor}
-                data={this.props.clinicsForSpeciality}
-                renderItem={this.renderItem}
-                containerStyle={{ borderBottomWidth: 0 }}
-                ItemSeparatorComponent={this.renderSeparator}
-                />
-            </View>
+            <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%', position:'absolute'}}>
+                <View style={styles.container}>
+                    <FlatList
+                    keyExtractor={this.keyExtractor}
+                    data={this.props.clinicsForSpeciality}
+                    renderItem={this.renderItem}
+                    containerStyle={{ borderBottomWidth: 0 }}
+                    ItemSeparatorComponent={this.renderSeparator}
+                    />
+                </View>
+            </ImageBackground>
           )
     }
 
@@ -61,7 +78,7 @@ class ClinicsScreen extends React.Component {
              clinicName: name,
              clinicCoords: coords,
              specialityId: this.props.navigation.getParam('specialityId')});
-    }
+    };
 }
 
 const mapStateToProps = state => ({
@@ -75,10 +92,8 @@ const mapDispatchToProps = dispatch => ({
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        paddingTop: 50,
+        paddingLeft: 10
     },
 });
 

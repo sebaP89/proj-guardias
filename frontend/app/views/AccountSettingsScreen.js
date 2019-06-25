@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Icon } from "react-native-elements";
 
 export default class AccountSettingsScreen extends React.Component {  
@@ -8,11 +8,14 @@ export default class AccountSettingsScreen extends React.Component {
     }
 
     static navigationOptions = ({ navigation }) => ({
-      headerTitle: "Planificar Salud",
+      headerTitle: "Mi Cuenta",
+      headerTransparent: true,
+      headerTitleStyle: { color: '#FFFFFF' },
       headerLeft: (
           <Icon
             name="md-menu"
             type="ionicon"
+            color='#FFFFFF'
             containerStyle={styles.icon}
             onPress={() => navigation.toggleDrawer()}
           />
@@ -21,9 +24,11 @@ export default class AccountSettingsScreen extends React.Component {
 
     render() {
       return (
-        <View style={styles.container}>
-          <Text>This is the SettingsScreen.</Text>
-        </View>
+        <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%'}}>
+          <View style={styles.container}>
+            <Text>This is the SettingsScreen.</Text>
+          </View>
+        </ImageBackground>
       );
     }
 }
@@ -32,7 +37,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    color:'#FFFFFF'
   },
   icon: {
     paddingLeft: 10

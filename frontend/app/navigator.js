@@ -23,7 +23,7 @@ const MainScreenStack = createStackNavigator({ MainScreen });
 
 MainScreenStack.navigationOptions = {
     drawerLabel: "Planificar Salud",
-    drawerIcon: ({ tintColor }) => <Icon name="md-cog" type="ionicon" color={tintColor} />
+    drawerIcon: ({ tintColor }) => <Icon name="md-home" type="ionicon" color={tintColor} />
 };
 
 const UrgenciesStack = createStackNavigator(
@@ -41,7 +41,7 @@ UrgenciesStack.navigationOptions = ({ navigation }) => {
     return {
         drawerLockMode,
         drawerLabel: "Guardias",
-        drawerIcon: ({ tintColor }) => <Icon name="md-home" type="ionicon" color={tintColor} />
+        drawerIcon: ({ tintColor }) => <Icon name="md-medical" type="ionicon" color={tintColor} />
     }
 };
 
@@ -67,7 +67,7 @@ MainNavigator.navigationOptions = {
 const AuthStack = createStackNavigator(
     { Login: LoginScreen,
       SignUp: SignUpScreen
-    }
+    }, { headerMode: 'none', }
 );
 
 const AppContainer = createAppContainer(createSwitchNavigator(

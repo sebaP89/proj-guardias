@@ -1,9 +1,8 @@
 import React from 'react';
-import { Button, StyleSheet, View, Text, FlatList } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ImageBackground, StyleSheet, View, Text, FlatList } from 'react-native';
+import { ListItem, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchSpecialities } from '../actions/userActions';
-import { Icon } from "react-native-elements";
 
 class SpecialitiesScreen extends React.Component {
   
@@ -13,10 +12,13 @@ class SpecialitiesScreen extends React.Component {
 
     static navigationOptions = ({ navigation }) => ({
         headerTitle: "Especialidades",
+        headerTransparent: true,
+        headerTitleStyle: { color: '#FFFFFF' },
         headerLeft: (
             <Icon
               name="md-menu"
               type="ionicon"
+              color='#FFFFFF'
               containerStyle={styles.icon}
               onPress={() => navigation.toggleDrawer()}
             />
@@ -31,9 +33,9 @@ class SpecialitiesScreen extends React.Component {
 
     renderItem = ({ item }) => (
     <ListItem
-        containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}
+        containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0, backgroundColor: 'transparent'}}
+        titleStyle={{ color: '#FFFFFF'}}
         title={item.specialityName}
-        containerStyle={{ borderBottomWidth: 0 }}
         onPress={this._showMoreApp}
     />
     )
@@ -54,15 +56,17 @@ class SpecialitiesScreen extends React.Component {
     render() {
         console.log(this.props.specialities);
         return (
-            <View>
-                <FlatList
-                keyExtractor={this.keyExtractor}
-                data={this.props.specialities}
-                renderItem={this.renderItem}
-                containerStyle={{ borderBottomWidth: 0 }}
-                ItemSeparatorComponent={this.renderSeparator}
-                />
-            </View>
+            <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%'}}>
+                <View style={styles.container}>
+                    <FlatList
+                    keyExtractor={this.keyExtractor}
+                    data={this.props.specialities}
+                    renderItem={this.renderItem}
+                    containerStyle={{ borderBottomWidth: 0 }}
+                    ItemSeparatorComponent={this.renderSeparator}
+                    />
+                </View>
+            </ImageBackground>
           )
     }
 
@@ -83,13 +87,11 @@ const mapDispatchToProps = dispatch => ({
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        paddingTop: 50,
+        paddingLeft: 10
     },
     icon: {
-        paddingLeft: 10
+        paddingLeft: 10,
     }
 });
 

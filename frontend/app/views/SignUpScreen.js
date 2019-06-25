@@ -1,79 +1,180 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import { ImageBackground, Picker, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { connect } from 'react-redux';
+import { createUser, fetchClinics } from '../actions/userActions';
 
-const userInfo = {username:'admin', password:'1234'}
+class SignUpScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = ({ 
+      user: {},
+      clinic: {}
+    })
+  }
 
-export default class LoginScreen extends React.Component {  
-    constructor(props){
-      super(props);
-      this.state = {username:'', password:''}
-    }
-
-    render() {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.input}>Nombre</Text>
-          <TextInput
-            style={styles.input}
-          />
-          <Text style={styles.input}>Apellido</Text>
-          <TextInput
-            style={styles.input}
-          />
-
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={async () => {this.props.navigation.navigate('Login')}}
-          >
-          <Text style={styles.btnText}>Atras</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-  
-    _signInAsync = async () => {
-      if(userInfo.username===this.state.username &&
-        userInfo.password===this.state.password){
-          await AsyncStorage.setItem('@logged', '1');
-          this.props.navigation.navigate('App');
-        } else {
-          alert('Username or Password wrong!')
-        }
-      
-    };
+  componentDidMount() {
+    this.props.fetchClinics();
 }
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      backgroundColor: '#F5FCFF'
-    },
-    welcome: {
-      fontSize: 20,
-      textAlign: 'center',
-      margin: 10,
-    },
-    input: {
-      borderBottomWidth: 1,
-      margin:15,
-      height:40,
-      padding:5,
-      fontSize:16,
-      borderBottomColor:'#42BAF8'
-    },
-    btn: {
-      justifyContent: 'center',
-      flexDirection:'row',
-      backgroundColor:'#42BAF8',
-      alignItems:'center',
-      marginLeft: 15,
-      marginRight: 15,
-      padding: 10
-    },
-    btnText: {
-      color:'#ffffff',
-      fontWeight:'700'
+  render() {
+    
+    if (this.props.userCreated) {
+        alert('Usuario registrado');
+        this.props.navigation.navigate('Login');
     }
-  });
+
+    let serviceItems = this.props.clinics.map( (s, i) => {
+      return <Picker.Item key={i} value={s} label={s.clinicName} />
+    });
+    
+    return (
+    <ImageBackground source={require('../image/planificarBlur.png')} style={{width: '100%', height: '100%'}}>
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre"
+          placeholderTextColor = "#FFFFFF"
+          onChangeText={(text) => 
+            this.setState({
+              user:{
+                ...this.state.user,
+                firstname: text
+              } 
+            })}
+          value={this.state.user.firstname}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Apellido"
+          placeholderTextColor = "#FFFFFF"
+          onChangeText={(text) => 
+            this.setState({
+              user:{
+                ...this.state.user,
+                lastname: text
+              } 
+            })}
+          value={this.state.user.lastname}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor = "#FFFFFF"
+          onChangeText={(text) => 
+            this.setState({
+              user:{
+                ...this.state.user,
+                email: text
+              } 
+            })}
+          value={this.state.user.email}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          placeholderTextColor = "#FFFFFF"
+          onChangeText={(text) => 
+            this.setState({
+              user:{
+                ...this.state.user,
+                password: text
+              } 
+            })}
+          value={this.state.user.password}
+          secureTextEntry={true}
+        />
+        <View style={styles.pickerContainer}>
+          <Picker
+              style={styles.pickerStyle} 
+              selectedValue={this.state.clinic}
+              onValueChange={ (clinic) =>
+                this.setState({
+                  clinic:clinic
+                })
+              } >
+              {serviceItems}
+          </Picker>
+        </View>
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={this._signInAsync}
+        >
+          <Text style={styles.btnText}>Registrarse</Text>
+        </TouchableOpacity>
+
+      </View>
+    </ImageBackground>
+    );
+  }
+
+  _signInAsync = async => {
+
+    if (this.state.user.firstname != "" &&
+        this.state.user.lastname != "" &&
+        this.state.user.email != "" &&
+        this.state.user.password != "")
+    {
+      this.props.createUser(this.state.user, this.state.clinic.idClinic);
+    }
+    else
+    {
+      alert('Por favor, ingrese todos los campos');
+    }
+  };
+}
+
+const mapStateToProps = state => ({
+  userCreated: state.user.userCreated,
+  clinics: state.user.clinics,
+});
+
+
+const mapDispatchToProps = dispatch => ({
+  createUser: (user, idClinic) => dispatch(createUser(user, idClinic)),
+  fetchClinics: () => dispatch(fetchClinics())
+});
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  pickerContainer: {
+    alignItems: 'center',  
+    margin: 15,
+    height: 40,
+    padding: 5,
+    justifyContent: 'center'
+  },
+  pickerStyle: {  
+    width: "80%",  
+    color: '#FFFFFF', 
+  },
+  input: {
+    borderBottomWidth: 1,
+    margin: 15,
+    height: 40,
+    padding: 5,
+    fontSize: 18,
+    borderBottomColor: '#42BAF8',
+    color: '#FFFFFF'
+  },
+  btn: {
+    justifyContent: 'space-between',
+    flexDirection: 'column',
+    borderWidth: 1,
+    borderRadius:10,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    marginLeft: 15,
+    marginRight: 15,
+    marginBottom: 10,
+    padding: 10
+  },
+  btnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUpScreen);
