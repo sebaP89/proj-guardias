@@ -14,6 +14,12 @@ import {
     FETCH_CLINICS_FOR_SPECIALITY_PENDING,
     FETCH_CLINICS_FOR_SPECIALITY_SUCCESS,
     FETCH_CLINICS_FOR_SPECIALITY_ERROR,
+    BOOKING_SUCCESS,
+    BOOKING_PENDING,
+    BOOKING_ERROR,
+    FETCH_BOOKING_ERROR,
+    FETCH_BOOKING_PENDING,
+    FETCH_BOOKING_SUCCESS
 } from "../constants/actionsTypes";
 
 const userValid = (idUser) => ({
@@ -78,6 +84,34 @@ const fetchClinicsForSpecialitySuccess = (clinicsForSpeciality) => ({
 const fetchClinicsForSpecialityError = (error) => ({
     type: FETCH_CLINICS_FOR_SPECIALITY_ERROR,
     error: error
+});
+
+const bookingPending = () => ({
+    type: BOOKING_PENDING
+});
+
+const bookingSuccess = (bookingNumber) => ({
+    type: BOOKING_SUCCESS,
+    bookingNumber: bookingNumber
+});
+
+const bookingError = (error) => ({
+    type: BOOKING_ERROR,
+    error: error
+});
+
+const fetchBookingError = (error) => ({
+    type: FETCH_BOOKING_ERROR,
+    error: error
+});
+
+const fetchBookingPending = () => ({
+    type: FETCH_BOOKING_PENDING
+});
+
+const fetchBookingSuccess = (booking) => ({
+    type: FETCH_BOOKING_SUCCESS,
+    booking: booking
 });
 
 export const logedout = () => ({
@@ -200,6 +234,56 @@ export function fetchClinicsForSpeciality(userId, specialityId) {
         })
         .catch(error => {
             dispatch(fetchClinicsForSpecialityError(error));
+        })
+    }
+};
+
+export function book(idUser, idClinic, idSpeciality) {
+    return dispatch => {
+        dispatch(bookingPending());
+        //fetch('http://10.0.2.2:3000/api/v1/user/urgency', {
+        fetch('http://192.168.1.19:3000/api/v1/user/urgency', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                idUser: idUser,
+                idClinic: idClinic,
+                idSpeciality: idSpeciality
+            })
+        })
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(bookingSuccess(response.user.number));
+            return response.message;
+        })
+        .catch(error => {
+            dispatch(bookingError(error));
+        })
+    }
+};
+
+export function fetchBooking(userId) {
+    return dispatch => {
+        dispatch(fetchBookingPending());
+        //fetch(`http://10.0.2.2:3000/api/v1/user/urgency/${userId}`, {
+        fetch(`http://192.168.1.19:3000/api/v1/user/urgency/${userId}`, {
+        method: 'GET'})
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(fetchBookingSuccess(response.booking));
+            return response.booking;
+        })
+        .catch(error => {
+            dispatch(fetchBookingError(error));
         })
     }
 };

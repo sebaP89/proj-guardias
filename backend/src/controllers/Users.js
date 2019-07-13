@@ -150,8 +150,53 @@ const Users = {
       return res.status(400).send(error)
     }
   },
+
+  /**
+   * Login
+   * @param {object} req 
+   * @param {object} res
+   * @returns {object} return status code 204
+   */
+  async addUrgency(req, res) {
+    const createQuery = `INSERT INTO
+    public."urgency"("idUser", "idClinic", "idSpeciality", number, timestamp)
+    VALUES($1, $2, $3, $4, $5)
+    returning *`;
+
+    const number = Helper.makeBookingNumber(4);
+    const values = [
+      req.body.idUser,
+      req.body.idClinic,
+      req.body.idSpeciality,
+      number,
+      moment(new Date())
+    ];
+
+    try {
+      const { rows } = await db.query(createQuery, values);
+      return res.status(201).send({ user: rows[0] });
+    } catch(error) {
+      return res.status(400).send(error);
+    }
+  },
+
+  async getUrgency(req, res) {
+    const text = `SELECT u.number as "bookingNumber", c.name as "clinicName" FROM public.urgency as u
+      inner join public."clinic" as c on (c.id = u."idClinic")
+      where u."idUser" = $1
+      order by u.timestamp desc`;
+    try {
+      console.log(text);
+      console.log(req.params.id);
+      const { rows } = await db.query(text, [req.params.id]);
+      if (!rows[0]) {
+        return res.status(200).send({ booking: {} });
+      }
+      return res.status(200).send({ booking: rows[0] });
+    } catch(error) {
+      return res.status(400).send(error)
+    }
+  },
 }
-
-
 
 export default Users;

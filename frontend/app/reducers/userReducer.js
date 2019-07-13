@@ -14,6 +14,12 @@ import {
     FETCH_CLINICS_FOR_SPECIALITY_PENDING,
     FETCH_CLINICS_FOR_SPECIALITY_SUCCESS,
     FETCH_CLINICS_FOR_SPECIALITY_ERROR,
+    BOOKING_SUCCESS,
+    BOOKING_PENDING,
+    BOOKING_ERROR,
+    FETCH_BOOKING_SUCCESS,
+    FETCH_BOOKING_PENDING,
+    FETCH_BOOKING_ERROR
 } from "../constants/actionsTypes";
 
 const initialState = {
@@ -24,7 +30,9 @@ const initialState = {
     specialities: [],
     clinicsForSpeciality: [],
     error: null,
-    clinics: []
+    clinics: [],
+    bookingNumber: null,
+    booking: {}
 };
 
 export default function userReducer(
@@ -36,6 +44,8 @@ export default function userReducer(
         case FETCH_SPECIALITIES_PENDING:
         case FETCH_CLINICS_FOR_SPECIALITY_PENDING:
         case FETCH_CLINICS_PENDING:
+        case BOOKING_PENDING:
+        case FETCH_BOOKING_PENDING:
             console.log('Loading');
             return {
                 ...state,
@@ -83,10 +93,28 @@ export default function userReducer(
                 loading: false,
                 clinicsForSpeciality: action.clinicsForSpeciality
             }
+        case BOOKING_SUCCESS:
+            console.log(`Reducer received booking number ${action.bookingNumber}`);
+            return {
+                ...state,
+                loading: false,
+                bookingNumber: action.bookingNumber
+            }
+        case FETCH_BOOKING_SUCCESS:
+            console.log(`Reducer received booking ${JSON.stringify(action.booking)}`);
+            return {
+                ...state,
+                loading: false,
+                booking: action.booking,
+                bookingNumber: action.booking.bookingNumber
+            }
         case FETCH_SPECIALITIES_ERROR:
         case FETCH_CLINICS_FOR_SPECIALITY_ERROR:
         case FETCH_CLINICS_ERROR:
         case ERROR_CREATING_USER:
+        case BOOKING_ERROR:
+        case FETCH_BOOKING_ERROR:
+            console.log("error received");
             return {
                 ...state,
                 loading: false,

@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, ImageBackground, TouchableOpacity, View } from 'react-native';
-import { ListItem, Icon } from 'react-native-elements';
+import { StyleSheet, Text, ImageBackground, View } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 class BookingScreen extends React.Component {
-
+    
     static navigationOptions = ({ navigation }) => ({
         headerTitle: "Turno",
         headerTransparent: true,
@@ -21,47 +22,28 @@ class BookingScreen extends React.Component {
     });
 
     render() {
-        const clinicId = this.props.navigation.getParam('clinicId', '-1');
         const clinicName = this.props.navigation.getParam('clinicName', 'No Name');
-        const coordinates = this.props.navigation.getParam('clinicCoords', 'No Name');
-
-        console.log(`${coordinates}`);
-        let arr = coordinates.split(', ');
-        console.log(`latitude: ${arr[0]}`);
-        console.log(`longitude: ${arr[1]}`);
-
+        const bookingNumber = this.props.bookingNumber;
+        
         return (
             <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%'}}>
                 <View style={styles.container}>
+                    <Spinner
+                        visible={this.props.loading}
+                        textStyle={styles.spinnerTextStyle}
+                    />
                     <Text style={styles.welcome}>Reserva!</Text>
                     <Text style={styles.welcome}>{clinicName}</Text>
-                    <TouchableOpacity
-                        style={styles.btn}
-                        onPress={this._signInAsync}
-                    >
-                        <Text style={styles.btnText}>GENERAR ORDEN</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.welcome}>{bookingNumber}</Text>
                 </View>
             </ImageBackground>
         );
     }
-
-    _signInAsync = async => {
-        alert('Reserva Generada: 23');
-        
-        //const clinicId = this.props.navigation.getParam('clinicId', '-1');
-        //const specialityId = this.props.navigation.getParam('specialityId', '-1');
-        //this.props.book(clinicId, specialityId);
-    };
 }
 
 const mapStateToProps = state => ({
-    clinicsForSpeciality: state.user.clinicsForSpeciality,
-    idUser: state.user.idUser,
-});
-
-const mapDispatchToProps = dispatch => ({
-    //book: (clinicId, specialityId) => dispatch(book(clinicId, specialityId))
+    loading: state.user.loading,
+    bookingNumber: state.user.bookingNumber
 });
 
 const styles = StyleSheet.create({
@@ -96,7 +78,10 @@ const styles = StyleSheet.create({
     btnText: {
         color: '#ffffff',
         fontWeight: '700'
+    },
+    icon: {
+        paddingLeft: 10,
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BookingScreen);
+export default connect(mapStateToProps, null)(BookingScreen);

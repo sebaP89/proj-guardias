@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.3.2",
+    "geolib": "^3.0.4",
     "react": "16.8.3",
     "react-art": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -15,7 +16,9 @@
     "react-native-bcrypt": "^2.4.0",
     "react-native-elements": "^1.1.0",
     "react-native-gesture-handler": "^1.1.0",
+    "react-native-loading-spinner-overlay": "^1.0.1",
     "react-native-maps": "^0.24.2",
+    "react-native-open-maps": "^0.3.3",
     "react-native-vector-icons": "^6.4.2",
     "react-native-web": "^0.11.2",
     "react-navigation": "^3.8.1",

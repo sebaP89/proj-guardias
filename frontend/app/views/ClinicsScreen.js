@@ -1,11 +1,11 @@
 import React from 'react';
-import { ImageBackground, StyleSheet, View, FlatList } from 'react-native';
-import { ListItem, Icon } from 'react-native-elements';
+import { StyleSheet, View, FlatList, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
-import { fetchClinicsForSpeciality } from '../actions/userActions';
+import { fetchClinicsForSpeciality, book } from '../actions/userActions';
+import { FlatListItem } from '../components/CustomClinicFlatList';
+import { Icon } from 'react-native-elements';
 
-class ClinicsScreen extends React.Component {
-    
+class ClinicScreenCustomFlatList extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -29,54 +29,34 @@ class ClinicsScreen extends React.Component {
         const { navigation } = this.props;
         this.props.fetchClinicsForSpeciality(this.props.idUser, navigation.getParam('specialityId'));
     }
-    
-    keyExtractor = (item, index) => index.toString()
-
-    renderItem = ({ item }) => (
-    <ListItem
-        containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0, backgroundColor: 'transparent' }}
-        titleStyle={{ color: '#FFFFFF'}}
-        title={item.clinicName}
-        onPress={() => this._moveToBooking(item.clinicId, item.clinicName, item.clinicCoords)}
-    />
-    )
-
-    renderSeparator = () => {
-        return (
-          <View
-            style={{
-              height: 1,
-              width: "86%",
-              backgroundColor: "#CED0CE",
-              marginLeft: "14%"
-            }}
-          />
-        );
-    };
 
     render() {
-        console.log(this.props.clinicsForSpeciality);
         return (
-            <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%', position:'absolute'}}>
+            <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%', position:'absolute'}}>   
                 <View style={styles.container}>
                     <FlatList
-                    keyExtractor={this.keyExtractor}
-                    data={this.props.clinicsForSpeciality}
-                    renderItem={this.renderItem}
-                    containerStyle={{ borderBottomWidth: 0 }}
-                    ItemSeparatorComponent={this.renderSeparator}
-                    />
+                        data={this.props.clinicsForSpeciality}
+                        renderItem={({item, index})=>{
+                            return (
+                                <FlatListItem 
+                                    item={item}
+                                    index={index}
+                                    handlePress={() => this._moveToBooking(item.clinicId, item.clinicName)}
+                                />);
+                        }}
+                    >
+                    </FlatList>
                 </View>
             </ImageBackground>
-          )
+        );
     }
 
-    _moveToBooking = (id, name, coords) => {
-        console.log(`coordinates: ${coords}`)
+    _moveToBooking = (idClinic, clinicName) => {
+        this.props.book(this.props.idUser, idClinic, this.props.navigation.getParam('specialityId'));
+
         this.props.navigation.navigate('Booking', 
-            {clinicId: id, 
-             clinicName: name,
-             clinicCoords: coords,
+            {clinicId: idClinic, 
+             clinicName: clinicName,
              specialityId: this.props.navigation.getParam('specialityId')});
     };
 }
@@ -88,13 +68,22 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     fetchClinicsForSpeciality: (userId, specialityId) => dispatch(fetchClinicsForSpeciality(userId, specialityId)),
+    book: (userId, clinicId, specialityId) => dispatch(book(userId, clinicId, specialityId))
 });
 
 const styles = StyleSheet.create({
+    flatListItem: {
+        color: 'white',
+        padding:10,
+        fontSize:16,
+    },
     container: {
         paddingTop: 50,
         paddingLeft: 10
     },
+    icon: {
+        paddingLeft: 10,
+    }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ClinicsScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(ClinicScreenCustomFlatList);
