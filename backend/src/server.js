@@ -1,9 +1,10 @@
 // server.js
 import express from 'express';
 import dotenv from 'dotenv';
-import 'babel-polyfill';
-import Users from './src/controllers/Users';
-import HealthInsurance from './src/controllers/HealthInsurance';
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import Users from './controllers/Users';
+import HealthInsurance from './controllers/HealthInsurance';
 
 dotenv.config();
 const app = express()
@@ -26,4 +27,4 @@ app.post('/api/v1/user/urgency', Users.addUrgency);
 app.get('/api/v1/user/urgency/:id',  Users.getUrgency);
 
 app.listen(3000)
-console.log('app running on port ', 3000);
+console.log('app listening on port ', 3000);

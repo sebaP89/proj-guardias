@@ -5,20 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel server.js --out-dir build",
-    "dev-start": "babel-watch server.js"
+    "build": "babel ./src --out-dir build",
+    "dev-start": "npm run build && babel-watch ./src/server.js",
+    "prod-start": "npm run build && node ./build/server.js"
   },
   "author": "Sebastian",
   "license": "ISC",
   "dependencies": {
-    "@babel/polyfill": "^7.4.0",
     "bcrypt": "^3.0.5",
+    "core-js": "^3.2.1",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.1",
     "make-runnable": "^1.3.6",
     "moment": "^2.24.0",
     "pg": "^7.9.0",
+    "pm2": "^3.5.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
