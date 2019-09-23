@@ -30,7 +30,6 @@ class BookingScreen extends React.Component {
                 <View style={styles.container}>
                     <Spinner
                         visible={this.props.loading}
-                        textStyle={styles.spinnerTextStyle}
                     />
                     <Text style={styles.welcome}>Reserva!</Text>
                     <Text style={styles.welcome}>{clinicName}</Text>

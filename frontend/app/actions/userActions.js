@@ -1,26 +1,34 @@
 import {
+    FETCHING_DATA,
+    ERROR_FETCHING_DATA,
+    DATA_FETCHED,
     VALID_USER,
     INVALID_USER,
-    VALIDATE_USER_BEGIN,
     LOGED_OUT,
     USER_CREATED,
-    ERROR_CREATING_USER,
-    FETCH_SPECIALITIES_PENDING,
-    FETCH_SPECIALITIES_ERROR,
+    FETCH_USER_DATA_SUCCESS,
     FETCH_SPECIALITIES_SUCCESS,
-    FETCH_CLINICS_ERROR,
-    FETCH_CLINICS_PENDING,
-    FETCH_CLINICS_SUCCESS,
-    FETCH_CLINICS_FOR_SPECIALITY_PENDING,
+    FETCH_HEALTH_INSURANCES_SUCCESS,
     FETCH_CLINICS_FOR_SPECIALITY_SUCCESS,
-    FETCH_CLINICS_FOR_SPECIALITY_ERROR,
     BOOKING_SUCCESS,
-    BOOKING_PENDING,
-    BOOKING_ERROR,
-    FETCH_BOOKING_ERROR,
-    FETCH_BOOKING_PENDING,
-    FETCH_BOOKING_SUCCESS
+    FETCH_BOOKING_SUCCESS,
+    REFRESHING,
+    FINISH_REFRESHING,
+    COORDINATES_REFRESH
 } from "../constants/actionsTypes";
+
+const errorFetchingData = (error) => ({
+    type: ERROR_FETCHING_DATA,
+    error: error
+});
+
+export const fetchingData = () => ({
+    type: FETCHING_DATA
+});
+
+const dataFetched = () => ({
+    type: DATA_FETCHED
+});
 
 const userValid = (idUser) => ({
     type: VALID_USER,
@@ -31,21 +39,18 @@ const userInvalid = () => ({
     type: INVALID_USER
 });
 
-const validatingUser = () => ({
-    type: VALIDATE_USER_BEGIN
-});
-
 const userCreated = () => ({
     type: USER_CREATED
 });
 
-const errorCreatingUser = (error) => ({
-    type: ERROR_CREATING_USER,
-    error: error
+const fetchUserDataSuccess = (userData) => ({
+    type: FETCH_USER_DATA_SUCCESS,
+    userData: userData
 });
 
-const fetchSpecialitiesPending = () => ({
-    type: FETCH_SPECIALITIES_PENDING
+const coordinatesRefreshed = (coordinates) => ({
+    type: COORDINATES_REFRESH,
+    coordinates: coordinates
 });
 
 const fetchSpecialitiesSuccess = (specialities) => ({
@@ -53,27 +58,9 @@ const fetchSpecialitiesSuccess = (specialities) => ({
     specialities: specialities
 });
 
-const fetchSpecialitiesError = (error) => ({
-    type: FETCH_SPECIALITIES_ERROR,
-    error: error
-});
-
-const fetchClinicsPending = () => ({
-    type: FETCH_CLINICS_PENDING
-});
-
-const fetchClinicsSuccess = (clinics) => ({
-    type: FETCH_CLINICS_SUCCESS,
-    clinics: clinics
-});
-
-const fetchClinicsError = (error) => ({
-    type: FETCH_CLINICS_ERROR,
-    error: error
-});
-
-export const fetchClinicsForSpecialityPending = () => ({
-    type: FETCH_CLINICS_FOR_SPECIALITY_PENDING
+const fetchHealthInsurancesSuccess = (healthInsurances) => ({
+    type: FETCH_HEALTH_INSURANCES_SUCCESS,
+    healthInsurances: healthInsurances
 });
 
 const fetchClinicsForSpecialitySuccess = (clinicsForSpeciality) => ({
@@ -81,32 +68,9 @@ const fetchClinicsForSpecialitySuccess = (clinicsForSpeciality) => ({
     clinicsForSpeciality: clinicsForSpeciality
 });
 
-const fetchClinicsForSpecialityError = (error) => ({
-    type: FETCH_CLINICS_FOR_SPECIALITY_ERROR,
-    error: error
-});
-
-const bookingPending = () => ({
-    type: BOOKING_PENDING
-});
-
 const bookingSuccess = (bookingNumber) => ({
     type: BOOKING_SUCCESS,
     bookingNumber: bookingNumber
-});
-
-const bookingError = (error) => ({
-    type: BOOKING_ERROR,
-    error: error
-});
-
-const fetchBookingError = (error) => ({
-    type: FETCH_BOOKING_ERROR,
-    error: error
-});
-
-const fetchBookingPending = () => ({
-    type: FETCH_BOOKING_PENDING
 });
 
 const fetchBookingSuccess = (booking) => ({
@@ -118,9 +82,17 @@ export const logedout = () => ({
     type: LOGED_OUT
 });
 
+const refreshing = () => ({
+    type: REFRESHING
+});
+
+const finishRefreshing = () => ({
+    type: FINISH_REFRESHING
+});
+
 function isUserValid(user) {
     //return fetch('http://10.0.2.2:3000/api/v1/user/login/', {
-    return fetch('http://192.168.1.19:3000/api/v1/user/login/', {
+    return fetch('https://proj-guardias.herokuapp.com/api/v1/user/login/', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -137,7 +109,7 @@ function isUserValid(user) {
 
 export function validateUser(user) {
     return dispatch => {
-        dispatch(validatingUser());
+        dispatch(fetchingData());
         return isUserValid(user)
             .then(
                 response => response.user == undefined ? dispatch(userInvalid()) : dispatch(userValid(response.user.id)),
@@ -146,30 +118,31 @@ export function validateUser(user) {
     }
 };
 
-export function fetchClinics() {
+export function fetchHealthInsurances() {
     return dispatch => {
-        dispatch(fetchClinicsPending());
+        dispatch(fetchingData());
         //fetch('http://10.0.2.2:3000/api/v1/healthInsurance', {
-        fetch('http://192.168.1.19:3000/api/v1/healthInsurance', {
+        fetch('https://proj-guardias.herokuapp.com/api/v1/healthInsurance', {
         method: 'GET'})
         .then(response => response.json())
         .then(response => {
             if(response.error) {
                 throw(response.error);
             }
-            dispatch(fetchClinicsSuccess(response.clinics));
-            return response.clinics;
+            dispatch(fetchHealthInsurancesSuccess(response.healthInsurances));
+            return response.healthInsurances;
         })
         .catch(error => {
-            dispatch(fetchClinicsError(error));
+            dispatch(errorFetchingData(error));
         })
     }
 };
 
-export function createUser(user, idClinic) {
+export function createUser(user, idHealthInsurance) {
     return dispatch => {
+        dispatch(fetchingData());
         //fetch('http://10.0.2.2:3000/api/v1/users', {
-        fetch('http://192.168.1.19:3000/api/v1/users', {
+        fetch('https://proj-guardias.herokuapp.com/api/v1/users', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -180,7 +153,7 @@ export function createUser(user, idClinic) {
                 lastname: user.lastname,
                 email: user.email,
                 password: user.password,
-                idClinic: idClinic
+                idHealthInsurance: idHealthInsurance
             })
         })
         .then(response => response.json())
@@ -192,16 +165,74 @@ export function createUser(user, idClinic) {
             return response.message;
         })
         .catch(error => {
-            dispatch(errorCreatingUser(error));
+            dispatch(errorFetchingData(error));
         })
+    }
+};
+
+export function updateUser(userId, user, idHealthInsurance) {
+    return dispatch => {
+        dispatch(fetchingData());
+        //fetch('http://10.0.2.2:3000/api/v1/users/${userId}', {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/users/${userId}`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                idHealthInsurance: idHealthInsurance
+            })
+        })
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                console.log("Error:" + response.error)
+                throw(response.error);
+            }
+            dispatch(dataFetched());
+            return response.message;
+        })
+        .catch(error => {
+            dispatch(errorFetchingData(error));
+        })
+    }
+};
+
+export function fetchUserData(userId) {
+    return dispatch => {
+        dispatch(fetchingData());
+        //fetch(`http://10.0.2.2:3000/api/v1/user/urgency/${userId}`, {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/users/${userId}`, {
+        method: 'GET'})
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(fetchUserDataSuccess(response.userData));
+            return response.userData;
+        })
+        .catch(error => {
+            dispatch(errorFetchingData(error));
+        })
+    }
+};
+
+export function refreshCoordinates(coordinates) {
+    return dispatch => {
+        dispatch(coordinatesRefreshed(coordinates));
     }
 };
 
 export function fetchSpecialities(userId) {
     return dispatch => {
-        dispatch(fetchSpecialitiesPending());
+        dispatch(fetchingData());
         //fetch(`http://10.0.2.2:3000/api/v1/user/specialities/${userId}`, {
-        fetch(`http://192.168.1.19:3000/api/v1/user/specialities/${userId}`, {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/user/specialities/${userId}`, {
             
         method: 'GET'})
         .then(response => response.json())
@@ -213,16 +244,16 @@ export function fetchSpecialities(userId) {
             return response.specialities;
         })
         .catch(error => {
-            dispatch(fetchSpecialitiesError(error));
+            dispatch(errorFetchingData(error));
         })
     }
 };
 
 export function fetchClinicsForSpeciality(userId, specialityId) {
     return dispatch => {
-        dispatch(fetchClinicsForSpecialityPending());
+        dispatch(fetchingData());
         //fetch(`http://10.0.2.2:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
-        fetch(`http://192.168.1.19:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/user/clinics/${userId}&${specialityId}`, {
         method: 'GET'})
         .then(response => response.json())
         .then(response => {
@@ -233,16 +264,16 @@ export function fetchClinicsForSpeciality(userId, specialityId) {
             return response.clinics;
         })
         .catch(error => {
-            dispatch(fetchClinicsForSpecialityError(error));
+            dispatch(errorFetchingData(error));
         })
     }
 };
 
 export function book(idUser, idClinic, idSpeciality) {
     return dispatch => {
-        dispatch(bookingPending());
+        dispatch(fetchingData());
         //fetch('http://10.0.2.2:3000/api/v1/user/urgency', {
-        fetch('http://192.168.1.19:3000/api/v1/user/urgency', {
+        fetch('https://proj-guardias.herokuapp.com/api/v1/user/urgency', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -263,16 +294,16 @@ export function book(idUser, idClinic, idSpeciality) {
             return response.message;
         })
         .catch(error => {
-            dispatch(bookingError(error));
+            dispatch(errorFetchingData(error));
         })
     }
 };
 
 export function fetchBooking(userId) {
     return dispatch => {
-        dispatch(fetchBookingPending());
+        dispatch(fetchingData());
         //fetch(`http://10.0.2.2:3000/api/v1/user/urgency/${userId}`, {
-        fetch(`http://192.168.1.19:3000/api/v1/user/urgency/${userId}`, {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/user/urgency/${userId}`, {
         method: 'GET'})
         .then(response => response.json())
         .then(response => {
@@ -283,7 +314,52 @@ export function fetchBooking(userId) {
             return response.booking;
         })
         .catch(error => {
-            dispatch(fetchBookingError(error));
+            dispatch(errorFetchingData(error));
+        })
+    }
+};
+
+export function refreshSpecialities(userId) {
+    return dispatch => {
+        dispatch(refreshing());
+        //fetch(`http://10.0.2.2:3000/api/v1/user/specialities/${userId}`, {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/user/specialities/${userId}`, {
+            
+        method: 'GET'})
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(finishRefreshing());
+            dispatch(fetchSpecialitiesSuccess(response.specialities));
+            return response.specialities;
+        })
+        .catch(error => {
+            dispatch(finishRefreshing());
+            dispatch(errorFetchingData(error));
+        })
+    }
+};
+
+export function refreshClinicsForSpeciality(userId, specialityId) {
+    return dispatch => {
+        dispatch(refreshing());
+        //fetch(`http://10.0.2.2:3000/api/v1/user/clinics/${userId}&${specialityId}`, {
+        fetch(`https://proj-guardias.herokuapp.com/api/v1/user/clinics/${userId}&${specialityId}`, {
+        method: 'GET'})
+        .then(response => response.json())
+        .then(response => {
+            if(response.error) {
+                throw(response.error);
+            }
+            dispatch(finishRefreshing());
+            dispatch(fetchClinicsForSpecialitySuccess(response.clinics));
+            return response.clinics;
+        })
+        .catch(error => {
+            dispatch(finishRefreshing());
+            dispatch(errorFetchingData(error));
         })
     }
 };

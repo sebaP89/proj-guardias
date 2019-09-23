@@ -5,7 +5,6 @@ import BurgerMenu from "./components/BurgerMenu";
 import MainScreen from './views/MainScreen';
 import AccountSettingsScreen from './views/AccountSettingsScreen';
 import SpecialitiesScreen from './views/SpecialitiesScreen';
-import ClinicsScreen from './views/ClinicsScreenOLD';
 import ClinicScreenCustomFlatList from './views/ClinicsScreen';
 import BookingScreen from './views/BookingScreen';
 

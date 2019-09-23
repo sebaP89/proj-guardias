@@ -2,38 +2,21 @@ import React from 'react';
 import { TouchableHighlight, StyleSheet, View, Text, Alert } from 'react-native';
 import openMap from 'react-native-open-maps';
 import { Icon } from 'react-native-elements';
-import getDistance from 'geolib/es/getDistance';
 
 export class FlatListItem extends React.Component {
-    state = {
-        distance: ""
-      };
     
     constructor(props) {
         super(props);
     }
 
     componentDidMount() {
-        let coordsArray = this.props.item.clinicCoords.split(', ');
-        let latitude = parseFloat(coordsArray[0]);
-        let longitude = parseFloat(coordsArray[1]);
-        console.log(`latitude: ${latitude}. Longitude: ${longitude}`);
-        this._getDistance(latitude, longitude);
+        console.log("clinics flat list: component did mount called")
     }
 
-    _getDistance = (latitude, longitude) => {
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                console.log(`current coords: ${JSON.stringify(position)}`);
-                const distance = getDistance(position.coords, {
-                    latitude: latitude,
-                    longitude: longitude,
-                });
-                this.setState({ distance: (distance/1000).toFixed(2)});
-            }.bind(this)
-        )
-    };
-      
+    componentWillUnmount() { 
+        console.log("clinics flat list: component will unmount called")
+    }
+
     confirmBox() {
         Alert.alert(
           'Reserva',
@@ -46,10 +29,6 @@ export class FlatListItem extends React.Component {
     }
 
     render() {
-        let coordsArray = this.props.item.clinicCoords.split(', ');
-        let latitude = parseFloat(coordsArray[0]);
-        let longitude = parseFloat(coordsArray[1]);
-
         return (
             <View style={{
                 flex:1,
@@ -66,11 +45,11 @@ export class FlatListItem extends React.Component {
                             type="ionicon"
                             color="#FFFFFF"
                             containerStyle={styles.icon}
-                            onPress={() => openMap({ latitude, longitude})}/>
+                            onPress={() => openMap({ query: this.props.item.clinicName})}/>
                         <TouchableHighlight onPress={() => this.confirmBox()}>
                             <Text style={styles.flatListItem}> {this.props.item.clinicName} </Text>
                         </TouchableHighlight>
-                        <Text style={styles.rigthListItem}>{this.state.distance} km</Text>
+                        <Text style={styles.rigthListItem}>{this.props.item.distance ? this.props.item.distance : '0'} km</Text>
                     </View>
                 </View>
                 <View style={{

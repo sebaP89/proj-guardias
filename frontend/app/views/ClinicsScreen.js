@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, ImageBackground } from 'react-native';
+import { StyleSheet, View, FlatList, RefreshControl, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
-import { fetchClinicsForSpeciality, book } from '../actions/userActions';
+import { fetchClinicsForSpeciality, book, refreshClinicsForSpeciality, refreshCoordinates, fetchingData } from '../actions/userActions';
 import { FlatListItem } from '../components/CustomClinicFlatList';
 import { Icon } from 'react-native-elements';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 class ClinicScreenCustomFlatList extends React.Component {
     constructor(props) {
@@ -26,14 +27,26 @@ class ClinicScreenCustomFlatList extends React.Component {
     });
 
     componentDidMount() {
-        const { navigation } = this.props;
-        this.props.fetchClinicsForSpeciality(this.props.idUser, navigation.getParam('specialityId'));
+        console.log("clinics: component did mount called")
+        this.getCoordinates(function (coords) {
+            this.props.refreshCoordinates(coords);
+            this.props.fetchClinicsForSpeciality(this.props.idUser, this.props.navigation.getParam('specialityId'));
+          }.bind(this));
     }
+
+    componentWillUnmount() { 
+        console.log("clinics: component will unmount called")
+    }
+
+    keyExtractor = (item, index) => index.toString()
 
     render() {
         return (
             <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%', position:'absolute'}}>   
                 <View style={styles.container}>
+                    <Spinner
+                        visible={this.props.loading}
+                    />
                     <FlatList
                         data={this.props.clinicsForSpeciality}
                         renderItem={({item, index})=>{
@@ -44,11 +57,43 @@ class ClinicScreenCustomFlatList extends React.Component {
                                     handlePress={() => this._moveToBooking(item.clinicId, item.clinicName)}
                                 />);
                         }}
+                        keyExtractor={this.keyExtractor}
+                        refreshControl={
+                            <RefreshControl
+                              refreshing={this.props.isRefreshing}
+                              onRefresh={this.onRefresh.bind(this)}
+                            />
+                        }
                     >
                     </FlatList>
                 </View>
             </ImageBackground>
         );
+    }
+
+    onRefresh() {
+        this.getCoordinates(function (coords) {
+            this.props.refreshCoordinates(coords);
+            this.props.refreshClinicsForSpeciality(this.props.idUser, this.props.navigation.getParam('specialityId'));
+          }.bind(this));
+    }
+
+    getCoordinates(callback) {
+        this.props.fetchingData();
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                console.log(`current coords: ${JSON.stringify(position)}`);
+                callback(position.coords);
+            },
+            function(error) {
+                console.log("getCoordinates got error : ", error);
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000,
+            }
+        )
     }
 
     _moveToBooking = (idClinic, clinicName) => {
@@ -64,11 +109,16 @@ class ClinicScreenCustomFlatList extends React.Component {
 const mapStateToProps = state => ({
     clinicsForSpeciality: state.user.clinicsForSpeciality,
     idUser: state.user.idUser,
+    isRefreshing: state.user.refreshing,
+    loading: state.user.loading
 });
 
 const mapDispatchToProps = dispatch => ({
     fetchClinicsForSpeciality: (userId, specialityId) => dispatch(fetchClinicsForSpeciality(userId, specialityId)),
-    book: (userId, clinicId, specialityId) => dispatch(book(userId, clinicId, specialityId))
+    book: (userId, clinicId, specialityId) => dispatch(book(userId, clinicId, specialityId)),
+    refreshClinicsForSpeciality: (userId, specialityId) => dispatch(refreshClinicsForSpeciality(userId, specialityId)),
+    refreshCoordinates: coordinates => dispatch(refreshCoordinates(coordinates)),
+    fetchingData: () => dispatch(fetchingData())
 });
 
 const styles = StyleSheet.create({

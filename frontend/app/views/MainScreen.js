@@ -4,13 +4,18 @@ import { withNavigation } from "react-navigation";
 import { connect } from 'react-redux';
 import { Icon } from "react-native-elements";
 import Spinner from 'react-native-loading-spinner-overlay';
-import { fetchBooking } from '../actions/userActions';
+import { fetchBooking, refreshCoordinates } from '../actions/userActions';
 import { ErrorAlert } from '../components/ErrorAlert'
 import { isEmpty } from '../utils/helper';
+import { PermissionsAndroid } from 'react-native';
 
 class MainScreen extends React.Component {  
     constructor(props){
       super(props);
+
+      this.state = {
+        watchId: ''
+       };
     }
 
     static navigationOptions = ({ navigation }) => ({
@@ -28,17 +33,65 @@ class MainScreen extends React.Component {
         )
     });
 
-    componentDidMount() {
+    async componentDidMount() {
+      console.log("mainscreen: component did mount called")
+
+      await this.requestLocationPermission();
+      
       const { navigation } = this.props;
+
+      this._fetchLastestBooking();
+      
       this.focusListener = navigation.addListener("didFocus", () => {
         this._fetchLastestBooking();
       });
-      this._fetchLastestBooking();
+      
+      this.getCoordinates(function (coords) {
+        this.props.refreshCoordinates(coords);
+      }.bind(this));
     }
 
     componentWillUnmount() {
+      console.log("mainscreen: component will unmount called")
       // Remove the event listener
       this.focusListener.remove();
+    }
+
+    async requestLocationPermission() {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            'title': 'Location Permission',
+            'message': 'This App needs access to your location ' +
+                       'so we can know where you are.'
+          }
+        )
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("You can use locations ")
+        } else {
+          console.log("Location permission denied")
+        }
+      } catch (err) {
+        console.warn(err)
+      }
+    }
+
+    getCoordinates(callback) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          console.log(`current coords: ${JSON.stringify(position)}`);
+          callback(position.coords);
+        },
+        function(error) {
+          console.log("getCoordinates got error : ", error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000,
+        }
+      )
     }
 
     _fetchLastestBooking = () => {
@@ -90,6 +143,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   fetchBooking: userId => dispatch(fetchBooking(userId)),
+  refreshCoordinates: coordinates => dispatch(refreshCoordinates(coordinates))
 });
 
 const styles = StyleSheet.create({

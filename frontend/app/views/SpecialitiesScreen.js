@@ -1,8 +1,10 @@
 import React from 'react';
-import { ImageBackground, StyleSheet, View, Text, FlatList } from 'react-native';
+import { ImageBackground, StyleSheet, View, RefreshControl, FlatList } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchSpecialities } from '../actions/userActions';
+import { refreshSpecialities } from '../actions/userActions';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 class SpecialitiesScreen extends React.Component {
   
@@ -26,7 +28,22 @@ class SpecialitiesScreen extends React.Component {
     });
 
     componentDidMount() {
+        console.log("specialities: component did mount called")
         this.props.fetchSpecialities(this.props.idUser);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        console.log("specialities: should component update called")
+        update = false
+        if (nextProps.specialities != this.props.specialities) {
+            console.log("specialities: update needed")
+            update = true
+        }
+        return update;
+    }
+
+    componentWillUnmount() { 
+        console.log("specialities: component will unmount called")
     }
 
     keyExtractor = (item, index) => index.toString()
@@ -36,7 +53,7 @@ class SpecialitiesScreen extends React.Component {
         containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0, backgroundColor: 'transparent'}}
         titleStyle={{ color: '#FFFFFF'}}
         title={item.specialityName}
-        onPress={this._showMoreApp}
+        onPress={() => this._moveToClinics(item.specialityId)}
     />
     )
 
@@ -54,35 +71,51 @@ class SpecialitiesScreen extends React.Component {
     };
 
     render() {
-        console.log(this.props.specialities);
+
         return (
             <ImageBackground source={require('../image/planificar.png')} style={{width: '100%', height: '100%'}}>
                 <View style={styles.container}>
+                    <Spinner
+                        visible={this.props.loading}
+                    />
                     <FlatList
                     keyExtractor={this.keyExtractor}
                     data={this.props.specialities}
                     renderItem={this.renderItem}
                     containerStyle={{ borderBottomWidth: 0 }}
                     ItemSeparatorComponent={this.renderSeparator}
+                    refreshControl={
+                        <RefreshControl
+                          refreshing={this.props.isRefreshing}
+                          onRefresh={this.onRefresh.bind(this)}
+                        />
+                    }
                     />
                 </View>
             </ImageBackground>
           )
     }
 
-    _showMoreApp = () => {
+    onRefresh() {
+        this.props.refreshSpecialities(this.props.idUser);
+    }
+
+    _moveToClinics = (specialityId) => {
         this.props.navigation.navigate('Clinics', 
-        {specialityId:'7ab5873c-d4dd-3dd9-9e92-a8a58676b6a6'});
+        {specialityId:specialityId});
     };
 }
 
 const mapStateToProps = state => ({
     specialities: state.user.specialities,
     idUser: state.user.idUser,
+    isRefreshing: state.user.refreshing,
+    loading: state.user.loading
 })
 
 const mapDispatchToProps = dispatch => ({
     fetchSpecialities: userId => dispatch(fetchSpecialities(userId)),
+    refreshSpecialities: userId => dispatch(refreshSpecialities(userId)),
 });
 
 const styles = StyleSheet.create({

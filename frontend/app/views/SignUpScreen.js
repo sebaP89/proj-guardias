@@ -1,110 +1,137 @@
 import React from 'react';
 import { ImageBackground, Picker, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
-import { createUser, fetchClinics } from '../actions/userActions';
+import { createUser, fetchHealthInsurances } from '../actions/userActions';
+import Spinner from 'react-native-loading-spinner-overlay';
+import { isEmpty } from '../utils/helper';
 
 class SignUpScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = ({ 
       user: {},
-      clinic: {}
+      healthInsurance: {}
     })
   }
 
   componentDidMount() {
-    this.props.fetchClinics();
-}
+    console.log("sign up: component did mount called")
+    this.props.fetchHealthInsurances();
+  }
+
+  componentWillUnmount() {
+    console.log("sign up: component will unmount called")
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.userCreated) {
+      alert('Usuario registrado');
+      this.props.navigation.navigate('Login');
+      return false;
+    }
+    return true;
+  }
 
   render() {
-    
-    if (this.props.userCreated) {
-        alert('Usuario registrado');
-        this.props.navigation.navigate('Login');
+    if (this.props.loading)
+    {
+        console.log('loading account data')
+        return(
+          <ImageBackground source={require('../image/planificarBlur.png')} style={{width: '100%', height: '100%'}}>
+            <View style={styles.container}>
+                <Spinner
+                    visible={this.props.loading}
+                />
+            </View>
+          </ImageBackground>
+        );
     }
+    else
+    {
+      let serviceItems = this.props.healthInsurances.map( (s, i) => {
+        return <Picker.Item key={i} value={s} label={s.healthInsuranceName} />
+      });
+      
+      return (
+      <ImageBackground source={require('../image/planificarBlur.png')} style={{width: '100%', height: '100%'}}>
+        <View style={styles.container}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre"
+            placeholderTextColor = "#FFFFFF"
+            onChangeText={(text) => 
+              this.setState({
+                user:{
+                  ...this.state.user,
+                  firstname: text
+                } 
+              })}
+            value={this.state.user.firstname}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido"
+            placeholderTextColor = "#FFFFFF"
+            onChangeText={(text) => 
+              this.setState({
+                user:{
+                  ...this.state.user,
+                  lastname: text
+                } 
+              })}
+            value={this.state.user.lastname}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor = "#FFFFFF"
+            onChangeText={(text) => 
+              this.setState({
+                user:{
+                  ...this.state.user,
+                  email: text
+                } 
+              })}
+            value={this.state.user.email}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            placeholderTextColor = "#FFFFFF"
+            onChangeText={(text) => 
+              this.setState({
+                user:{
+                  ...this.state.user,
+                  password: text
+                } 
+              })}
+            value={this.state.user.password}
+            secureTextEntry={true}
+          />
+          <View style={styles.pickerContainer}>
+            <Picker
+                style={styles.pickerStyle} 
+                selectedValue={this.state.healthInsurance}
+                onValueChange={ (healthInsurance) =>
+                  this.setState({
+                    healthInsurance:healthInsurance
+                  })
+                } >
+                <Picker.Item value="Prepaga" label="Prepaga" />
+                {serviceItems}
+            </Picker>
+          </View>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={this._signInAsync}
+          >
+            <Text style={styles.btnText}>Registrarse</Text>
+          </TouchableOpacity>
 
-    let serviceItems = this.props.clinics.map( (s, i) => {
-      return <Picker.Item key={i} value={s} label={s.clinicName} />
-    });
-    
-    return (
-    <ImageBackground source={require('../image/planificarBlur.png')} style={{width: '100%', height: '100%'}}>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre"
-          placeholderTextColor = "#FFFFFF"
-          onChangeText={(text) => 
-            this.setState({
-              user:{
-                ...this.state.user,
-                firstname: text
-              } 
-            })}
-          value={this.state.user.firstname}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Apellido"
-          placeholderTextColor = "#FFFFFF"
-          onChangeText={(text) => 
-            this.setState({
-              user:{
-                ...this.state.user,
-                lastname: text
-              } 
-            })}
-          value={this.state.user.lastname}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor = "#FFFFFF"
-          onChangeText={(text) => 
-            this.setState({
-              user:{
-                ...this.state.user,
-                email: text
-              } 
-            })}
-          value={this.state.user.email}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          placeholderTextColor = "#FFFFFF"
-          onChangeText={(text) => 
-            this.setState({
-              user:{
-                ...this.state.user,
-                password: text
-              } 
-            })}
-          value={this.state.user.password}
-          secureTextEntry={true}
-        />
-        <View style={styles.pickerContainer}>
-          <Picker
-              style={styles.pickerStyle} 
-              selectedValue={this.state.clinic}
-              onValueChange={ (clinic) =>
-                this.setState({
-                  clinic:clinic
-                })
-              } >
-              {serviceItems}
-          </Picker>
         </View>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={this._signInAsync}
-        >
-          <Text style={styles.btnText}>Registrarse</Text>
-        </TouchableOpacity>
-
-      </View>
-    </ImageBackground>
-    );
+      </ImageBackground>
+      );
+    }
   }
 
   _signInAsync = async => {
@@ -112,9 +139,12 @@ class SignUpScreen extends React.Component {
     if (this.state.user.firstname != "" &&
         this.state.user.lastname != "" &&
         this.state.user.email != "" &&
-        this.state.user.password != "")
+        this.state.user.password != "" &&
+        !isEmpty(this.state.healthInsurance) &&
+        this.state.healthInsurance != 'Prepaga')
     {
-      this.props.createUser(this.state.user, this.state.clinic.idClinic);
+      console.log(JSON.stringify(this.state.healthInsurance))
+      this.props.createUser(this.state.user, this.state.healthInsurance.healthInsuranceId);
     }
     else
     {
@@ -125,13 +155,14 @@ class SignUpScreen extends React.Component {
 
 const mapStateToProps = state => ({
   userCreated: state.user.userCreated,
-  clinics: state.user.clinics,
+  healthInsurances: state.user.healthInsurances,
+  loading: state.user.loading
 });
 
 
 const mapDispatchToProps = dispatch => ({
-  createUser: (user, idClinic) => dispatch(createUser(user, idClinic)),
-  fetchClinics: () => dispatch(fetchClinics())
+  createUser: (user, healthInsuranceId) => dispatch(createUser(user, healthInsuranceId)),
+  fetchHealthInsurances: () => dispatch(fetchHealthInsurances())
 });
 
 const styles = StyleSheet.create({

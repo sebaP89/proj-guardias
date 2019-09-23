@@ -1,56 +1,60 @@
 import {
     VALID_USER,
     INVALID_USER,
-    VALIDATE_USER_BEGIN,
+    FETCHING_DATA,
+    DATA_FETCHED,
+    ERROR_FETCHING_DATA,
     LOGED_OUT,
     USER_CREATED,
-    ERROR_CREATING_USER,
-    FETCH_SPECIALITIES_PENDING,
-    FETCH_SPECIALITIES_ERROR,
+    FETCH_USER_DATA_SUCCESS,
     FETCH_SPECIALITIES_SUCCESS,
-    FETCH_CLINICS_ERROR,
-    FETCH_CLINICS_PENDING,
-    FETCH_CLINICS_SUCCESS,
-    FETCH_CLINICS_FOR_SPECIALITY_PENDING,
+    FETCH_HEALTH_INSURANCES_SUCCESS,
     FETCH_CLINICS_FOR_SPECIALITY_SUCCESS,
-    FETCH_CLINICS_FOR_SPECIALITY_ERROR,
     BOOKING_SUCCESS,
-    BOOKING_PENDING,
-    BOOKING_ERROR,
     FETCH_BOOKING_SUCCESS,
-    FETCH_BOOKING_PENDING,
-    FETCH_BOOKING_ERROR
+    REFRESHING,
+    FINISH_REFRESHING,
+    COORDINATES_REFRESH
 } from "../constants/actionsTypes";
+import { isEmpty } from '../utils/helper';
+import getDistance from 'geolib/es/getDistance';
 
 const initialState = {
     loading: false,
+    error: null,
     fetched: false,
     idUser: '',
+    userData: {},
     userCreated: false,
     specialities: [],
     clinicsForSpeciality: [],
-    error: null,
-    clinics: [],
+    healthInsurances: [],
     bookingNumber: null,
-    booking: {}
+    booking: {},
+    refreshing: false,
+    userCoordinates : null
 };
 
-export default function userReducer(
-    state = initialState,
-    action
-) {
+export default function userReducer(state = initialState, action) {
     switch (action.type) {
-        case VALIDATE_USER_BEGIN:
-        case FETCH_SPECIALITIES_PENDING:
-        case FETCH_CLINICS_FOR_SPECIALITY_PENDING:
-        case FETCH_CLINICS_PENDING:
-        case BOOKING_PENDING:
-        case FETCH_BOOKING_PENDING:
+        case FETCHING_DATA:
             console.log('Loading');
             return {
                 ...state,
                 loading: true,
             };
+        case ERROR_FETCHING_DATA:
+            console.log("error received" + action.error);
+            return {
+                ...state,
+                loading: false,
+                error: action.error
+            }
+        case DATA_FETCHED:
+            return {
+                ...state,
+                loading: false,
+            }
         case VALID_USER:
             console.log('Reducer received user valid!');
             console.log(action.payload);
@@ -63,7 +67,8 @@ export default function userReducer(
         case USER_CREATED:
                 return {
                     ...state,
-                    userCreated: true
+                    userCreated: true,
+                    loading: false,
                 };
         case INVALID_USER:
             console.log('Reducer received user invalid!');
@@ -72,12 +77,17 @@ export default function userReducer(
                 loading: false,
                 fetched: true
             };
-        case FETCH_CLINICS_SUCCESS:
-            console.log('Reducer received clinics');
+        case COORDINATES_REFRESH:
+            return {
+                ...state,
+                userCoordinates: action.coordinates
+            }
+        case FETCH_HEALTH_INSURANCES_SUCCESS:
+            console.log('Reducer received health insurances');
             return {
                 ...state,
                 loading: false,
-                clinics: action.clinics
+                healthInsurances: action.healthInsurances
             }
         case FETCH_SPECIALITIES_SUCCESS:
             console.log('Reducer received specialities');
@@ -88,6 +98,27 @@ export default function userReducer(
             }
         case FETCH_CLINICS_FOR_SPECIALITY_SUCCESS:
             console.log('Reducer received clinics for speciality');
+
+            action.clinicsForSpeciality.forEach(function(item,index,array) {
+                if (state.userCoordinates != null) {
+                    let coordsArray = item.clinicCoords.split(', ');
+                    let latitude = parseFloat(coordsArray[0]);
+                    let longitude = parseFloat(coordsArray[1]);
+                    const distance = getDistance(state.userCoordinates, {
+                        latitude: latitude,
+                        longitude: longitude,
+                    });
+                    item.distance = (distance/1000).toFixed(2);
+                }
+                else
+                {
+                    item.distance = 0;
+                }
+                array[index] = item;
+            });
+
+            action.clinicsForSpeciality.sort((a, b) => (a.distance > b.distance) ? 1 : -1)
+
             return {
                 ...state,
                 loading: false,
@@ -100,30 +131,34 @@ export default function userReducer(
                 loading: false,
                 bookingNumber: action.bookingNumber
             }
+        case FETCH_USER_DATA_SUCCESS:
+            console.log(`Reducer received userData ${JSON.stringify(action.userData)}`);
+            return {
+                ...state,
+                loading: false,
+                userData: action.userData
+            }
         case FETCH_BOOKING_SUCCESS:
             console.log(`Reducer received booking ${JSON.stringify(action.booking)}`);
             return {
                 ...state,
                 loading: false,
                 booking: action.booking,
-                bookingNumber: action.booking.bookingNumber
-            }
-        case FETCH_SPECIALITIES_ERROR:
-        case FETCH_CLINICS_FOR_SPECIALITY_ERROR:
-        case FETCH_CLINICS_ERROR:
-        case ERROR_CREATING_USER:
-        case BOOKING_ERROR:
-        case FETCH_BOOKING_ERROR:
-            console.log("error received");
-            return {
-                ...state,
-                loading: false,
-                error: action.error
+                bookingNumber: isEmpty(action.booking) ? -1 : action.booking.bookingNumber
             }
         case LOGED_OUT:
             console.log('Loging out!');
+            state = initialState;
+            return state;
+        case REFRESHING:
             return {
-                initialState
+                ...state,
+                refreshing: true,
+            };
+        case FINISH_REFRESHING:
+            return {
+                ...state,
+                refreshing: false,
             };
         default:
             return state;

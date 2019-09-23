@@ -2,6 +2,7 @@ import React from 'react';
 import { ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
 import { validateUser, logedout } from '../actions/userActions';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 class LoginScreen extends React.Component {
   constructor(props) {
@@ -9,21 +10,21 @@ class LoginScreen extends React.Component {
     this.state = { username: '', password: '' }
   }
 
-  render() {
+  componentDidMount() { 
+    console.log("login: component did mount called")
+  }
 
-    const { loading, userFetched, userId } = this.props;
+  componentWillUnmount() { 
+    console.log("login: component will unmount called")
+  }
 
-    if (loading) {
-      return (
-        <Text style={styles.welcome}>Loading</Text>
-      )
-    }
-
+  shouldComponentUpdate(nextProps, nextState) {
+    let update = true;
+    const {userFetched, userId } = nextProps;
+    console.log("userfetched? " + userFetched + " userId? " + userId)
     if (userFetched) {
-      console.log('user valid? ' + userId);
-      
       if (userId != '') {
-        console.log('user valid');
+        update = false;
         this.props.navigation.navigate('Main');
       } else {
         alert('Usuario o contraseña incorrecta!')
@@ -31,10 +32,16 @@ class LoginScreen extends React.Component {
       }
     }
 
+    return update;
+  }
+
+  render() {
     return (
     <ImageBackground source={require('../image/planificarBlur.png')} style={{width: '100%', height: '100%'}}>
       <View style={styles.container}>
-
+        <Spinner
+            visible={this.props.loading}
+        />
         <TextInput
           style={styles.input}
           placeholder="Email"
