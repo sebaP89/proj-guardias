@@ -4,7 +4,8 @@ import { withNavigation } from "react-navigation";
 import { connect } from 'react-redux';
 import { Icon } from "react-native-elements";
 import Spinner from 'react-native-loading-spinner-overlay';
-import { fetchBooking, refreshCoordinates } from '../actions/userActions';
+import { fetchBooking } from '../actions/bookingActions';
+import { refreshCoordinates } from '../actions/specialitiesActions';
 import { ErrorAlert } from '../components/ErrorAlert'
 import { isEmpty } from '../utils/helper';
 import { PermissionsAndroid } from 'react-native';
@@ -95,23 +96,23 @@ class MainScreen extends React.Component {
     }
 
     _fetchLastestBooking = () => {
-        this.props.fetchBooking(this.props.idUser);
+        this.props.fetchBooking(this.props.userId);
     };
 
     renderElement(){
-      const booking = this.props.booking;
-      if(!isEmpty(booking))
+      const bookingData = this.props.bookingData;
+      if(!isEmpty(bookingData))
           return <TouchableOpacity 
-                  onPress={() => this.props.navigation.navigate('Booking', { clinicName: booking.clinicName})}
+                  onPress={() => this.props.navigation.navigate('Booking', { clinicName: bookingData.clinicName})}
                   style={styles.button}>
-                    <Text style={styles.text}>{booking.bookingNumber} - {booking.clinicName}</Text>
+                    <Text style={styles.text}>{bookingData.bookingNumber} - {bookingData.clinicName}</Text>
                   </TouchableOpacity>;
       return null;
     }
 
     render() {
-      const {error,booking} = this.props;
-      if (error && isEmpty(booking))
+      const {error,bookingData} = this.props;
+      if (error && isEmpty(bookingData))
       {
         return (
           <ErrorAlert 
@@ -135,10 +136,10 @@ class MainScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  booking: state.user.booking,
-  idUser: state.user.idUser,
-  error: state.user.error,
-  loading: state.user.loading
+  bookingData: state.booking.bookingData,
+  userId: state.user.userId,
+  error: state.fetchStatus.error,
+  loading: state.fetchStatus.loading
 })
 
 const mapDispatchToProps = dispatch => ({

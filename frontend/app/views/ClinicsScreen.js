@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, ImageBackground } from 'react-native';
 import { connect } from 'react-redux';
-import { fetchClinicsForSpeciality, book, refreshClinicsForSpeciality, refreshCoordinates, fetchingData } from '../actions/userActions';
+import { fetchClinicsForSpeciality, refreshClinicsForSpeciality, refreshCoordinates, fetchingData } from '../actions/specialitiesActions';
+import { book } from '../actions/bookingActions';
 import { FlatListItem } from '../components/CustomClinicFlatList';
 import { Icon } from 'react-native-elements';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -30,7 +31,7 @@ class ClinicScreenCustomFlatList extends React.Component {
         console.log("clinics: component did mount called")
         this.getCoordinates(function (coords) {
             this.props.refreshCoordinates(coords);
-            this.props.fetchClinicsForSpeciality(this.props.idUser, this.props.navigation.getParam('specialityId'));
+            this.props.fetchClinicsForSpeciality(this.props.userId, this.props.navigation.getParam('specialityId'));
           }.bind(this));
     }
 
@@ -48,7 +49,7 @@ class ClinicScreenCustomFlatList extends React.Component {
                         visible={this.props.loading}
                     />
                     <FlatList
-                        data={this.props.clinicsForSpeciality}
+                        data={this.props.clinics}
                         renderItem={({item, index})=>{
                             return (
                                 <FlatListItem 
@@ -74,7 +75,7 @@ class ClinicScreenCustomFlatList extends React.Component {
     onRefresh() {
         this.getCoordinates(function (coords) {
             this.props.refreshCoordinates(coords);
-            this.props.refreshClinicsForSpeciality(this.props.idUser, this.props.navigation.getParam('specialityId'));
+            this.props.refreshClinicsForSpeciality(this.props.userId, this.props.navigation.getParam('specialityId'));
           }.bind(this));
     }
 
@@ -97,7 +98,7 @@ class ClinicScreenCustomFlatList extends React.Component {
     }
 
     _moveToBooking = (idClinic, clinicName) => {
-        this.props.book(this.props.idUser, idClinic, this.props.navigation.getParam('specialityId'));
+        this.props.book(this.props.userId, idClinic, this.props.navigation.getParam('specialityId'));
 
         this.props.navigation.navigate('Booking', 
             {clinicId: idClinic, 
@@ -107,10 +108,10 @@ class ClinicScreenCustomFlatList extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    clinicsForSpeciality: state.user.clinicsForSpeciality,
-    idUser: state.user.idUser,
-    isRefreshing: state.user.refreshing,
-    loading: state.user.loading
+    clinics: state.specialities.clinics,
+    userId: state.user.userId,
+    isRefreshing: state.fetchStatus.refreshing,
+    loading: state.fetchStatus.loading
 });
 
 const mapDispatchToProps = dispatch => ({

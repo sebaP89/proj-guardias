@@ -41,8 +41,8 @@ class BookingScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    loading: state.user.loading,
-    bookingNumber: state.user.bookingNumber
+    loading: state.fetchStatus.loading,
+    bookingNumber: state.booking.lastBookingNumber
 });
 
 const styles = StyleSheet.create({

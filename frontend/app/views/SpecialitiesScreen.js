@@ -2,8 +2,7 @@ import React from 'react';
 import { ImageBackground, StyleSheet, View, RefreshControl, FlatList } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { fetchSpecialities } from '../actions/userActions';
-import { refreshSpecialities } from '../actions/userActions';
+import { fetchSpecialities, refreshSpecialities } from '../actions/specialitiesActions';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 class SpecialitiesScreen extends React.Component {
@@ -29,7 +28,7 @@ class SpecialitiesScreen extends React.Component {
 
     componentDidMount() {
         console.log("specialities: component did mount called")
-        this.props.fetchSpecialities(this.props.idUser);
+        this.props.fetchSpecialities(this.props.userId);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -97,7 +96,7 @@ class SpecialitiesScreen extends React.Component {
     }
 
     onRefresh() {
-        this.props.refreshSpecialities(this.props.idUser);
+        this.props.refreshSpecialities(this.props.userId);
     }
 
     _moveToClinics = (specialityId) => {
@@ -107,10 +106,10 @@ class SpecialitiesScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    specialities: state.user.specialities,
-    idUser: state.user.idUser,
-    isRefreshing: state.user.refreshing,
-    loading: state.user.loading
+    specialities: state.specialities.specialities,
+    userId: state.user.userId,
+    isRefreshing: state.fetchStatus.refreshing,
+    loading: state.fetchStatus.loading
 })
 
 const mapDispatchToProps = dispatch => ({

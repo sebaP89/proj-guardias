@@ -1,7 +1,8 @@
 import React from 'react';
 import { ImageBackground, Picker, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
-import { createUser, fetchHealthInsurances } from '../actions/userActions';
+import { createUser } from '../actions/userActions';
+import { fetchHealthInsurances } from '../actions/specialitiesActions';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { isEmpty } from '../utils/helper';
 
@@ -155,8 +156,8 @@ class SignUpScreen extends React.Component {
 
 const mapStateToProps = state => ({
   userCreated: state.user.userCreated,
-  healthInsurances: state.user.healthInsurances,
-  loading: state.user.loading
+  healthInsurances: state.specialities.healthInsurances,
+  loading: state.fetchStatus.loading
 });
 
 

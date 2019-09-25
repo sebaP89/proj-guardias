@@ -93,8 +93,8 @@ class LoginScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  loading: state.user.loading,
-  userId: state.user.idUser,
+  loading: state.fetchStatus.loading,
+  userId: state.user.userId,
   userFetched: state.user.fetched
 });
 

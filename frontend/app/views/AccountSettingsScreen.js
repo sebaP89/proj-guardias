@@ -2,7 +2,8 @@ import React from 'react';
 import { ImageBackground, Picker, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
 import { Icon } from "react-native-elements"; 
-import { updateUser, fetchHealthInsurances, fetchUserData } from '../actions/userActions';
+import { updateUser, fetchUserData } from '../actions/userActions';
+import { fetchHealthInsurances } from '../actions/specialitiesActions';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { isEmpty } from '../utils/helper';
 
@@ -40,7 +41,7 @@ class AccountSettingsScreen extends React.Component {
 
   componentDidMount() {
     console.log("account: component did mount called")
-      this.props.fetchUserData(this.props.idUser);
+      this.props.fetchUserData(this.props.userId);
       this.props.fetchHealthInsurances();
 
       console.log(JSON.stringify(this.state))
@@ -213,7 +214,7 @@ class AccountSettingsScreen extends React.Component {
 
     if (canUpdate)
     {
-      this.props.updateUser(this.props.idUser, this.state.user, this.state.healthInsurance.healthInsuranceId);  
+      this.props.updateUser(this.props.userId, this.state.user, this.state.healthInsurance.healthInsuranceId);  
     }
     else 
     {
@@ -224,10 +225,10 @@ class AccountSettingsScreen extends React.Component {
 
 const mapStateToProps = state => ({
   userUpdated: state.user.userUpdated,
-  healthInsurances: state.user.healthInsurances,
+  healthInsurances: state.specialities.healthInsurances,
   userData: state.user.userData,
-  loading: state.user.loading,
-  idUser: state.user.idUser,
+  loading: state.fetchStatus.loading,
+  userId: state.user.userId,
 });
 
 
